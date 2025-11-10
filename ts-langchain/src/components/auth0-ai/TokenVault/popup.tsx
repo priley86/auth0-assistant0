@@ -4,12 +4,13 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { WaitingMessage } from '../util/loader';
 import { PromptUserContainer } from '../util/prompt-user-container';
-import { TokenVaultAuthProps } from './TokenVaultAuthProps';
+
+import type { TokenVaultAuthProps } from './TokenVaultAuthProps';
 
 export function TokenVaultConsentPopup({
-  interrupt: { connection, requiredScopes, resume, authorizationParams },
+  interrupt: { connection, requiredScopes, authorizationParams, resume },
   connectWidget: { icon, title, description, action, containerClassName },
-  auth: { connectPath = '/auth/login', returnTo = '/close' } = {},
+  auth: { connectPath = '/auth/connect', returnTo = '/close' } = {},
   onFinish,
 }: TokenVaultAuthProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -45,11 +46,13 @@ export function TokenVaultConsentPopup({
     const search = new URLSearchParams({
       connection,
       returnTo,
-      scope: requiredScopes.join(" "),
       // Add all extra authorization parameters to the search params, they will be collected and submitted via the
       // authorization_params parameter of the connect account flow.
       ...authorizationParams,
     });
+    for (const requiredScope of requiredScopes) {
+      search.append('scopes', requiredScope);
+    }
 
     const url = new URL(connectPath, window.location.origin);
     url.search = search.toString();
@@ -63,7 +66,7 @@ export function TokenVaultConsentPopup({
       setLoginPopup(popup);
       setIsLoading(true);
     }
-  }, [connection, requiredScopes, returnTo, connectPath, authorizationParams]);
+  }, [connection, requiredScopes, returnTo, authorizationParams, connectPath]);
 
   if (isLoading) {
     return <WaitingMessage />;
