@@ -1,6 +1,6 @@
 import { Auth0AI, getAccessTokenFromTokenVault } from '@auth0/ai-langchain';
 import { AccessDeniedInterrupt } from '@auth0/ai/interrupts';
-import { SUBJECT_TOKEN_TYPES } from "@auth0/ai";
+import { SUBJECT_TOKEN_TYPES } from '@auth0/ai';
 
 // Get the access token for a connection via Auth0
 export const getAccessToken = async () => getAccessTokenFromTokenVault();
@@ -9,8 +9,9 @@ export const getAccessToken = async () => getAccessTokenFromTokenVault();
 const auth0AICustomAPI = new Auth0AI({
   auth0: {
     domain: process.env.AUTH0_DOMAIN!,
-    clientId: process.env.AUTH0_CUSTOM_API_CLIENT_ID!, // Resource server client ID for token exchange
-    clientSecret: process.env.AUTH0_CUSTOM_API_CLIENT_SECRET!, // Resource server client secret
+    // For token exchange with Token Vault, we want to provide the Custom API Client credentials
+    clientId: process.env.AUTH0_CUSTOM_API_CLIENT_ID!, // Custom API Client ID for token exchange
+    clientSecret: process.env.AUTH0_CUSTOM_API_CLIENT_SECRET!, // Custom API Client secret
   },
 });
 
@@ -18,12 +19,13 @@ const auth0AICustomAPI = new Auth0AI({
 export const withGoogleConnection = auth0AICustomAPI.withTokenVault({
   connection: 'google-oauth2',
   scopes: [
+    'openid',
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.compose',
     'https://www.googleapis.com/auth/calendar.events',
   ],
   accessToken: async (_, config) => {
-      return config.configurable?.langgraph_auth_user?.getRawAccessToken();
+    return config.configurable?.langgraph_auth_user?.getRawAccessToken();
   },
   subjectTokenType: SUBJECT_TOKEN_TYPES.SUBJECT_TYPE_ACCESS_TOKEN,
 });
@@ -42,16 +44,16 @@ export const withAsyncAuthorization = auth0AI.withAsyncAuthorization({
   audience: process.env['SHOP_API_AUDIENCE']!,
   /**
    * Controls how long the authorization request is valid.
-  */
+   */
   // requestedExpiry: 301,
 
   /**
    * The behavior when the authorization request is made.
-   * 
+   *
    * - `block`: The tool execution is blocked until the user completes the authorization.
    * - `interrupt`: The tool execution is interrupted until the user completes the authorization.
    * - a callback: Same as "block" but give access to the auth request and executing logic.
-   * 
+   *
    * Defaults to `interrupt`.
    *
    * When this flag is set to `block`, the execution of the tool awaits
