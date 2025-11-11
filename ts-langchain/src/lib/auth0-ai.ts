@@ -16,19 +16,21 @@ const auth0AICustomAPI = new Auth0AI({
 });
 
 // Connection for Google services
-export const withGoogleConnection = auth0AICustomAPI.withTokenVault({
-  connection: 'google-oauth2',
-  scopes: [
-    'openid',
-    'https://www.googleapis.com/auth/gmail.readonly',
-    'https://www.googleapis.com/auth/gmail.compose',
-    'https://www.googleapis.com/auth/calendar.events',
-  ],
-  accessToken: async (_, config) => {
-    return config.configurable?.langgraph_auth_user?.getRawAccessToken();
-  },
-  subjectTokenType: SUBJECT_TOKEN_TYPES.SUBJECT_TYPE_ACCESS_TOKEN,
-});
+export const withGoogleConnection = (scopes: string[]) =>
+  auth0AICustomAPI.withTokenVault({
+    connection: 'google-oauth2',
+    scopes,
+    accessToken: async (_, config) => {
+      return config.configurable?.langgraph_auth_user?.getRawAccessToken();
+    },
+    subjectTokenType: SUBJECT_TOKEN_TYPES.SUBJECT_TYPE_ACCESS_TOKEN,
+  });
+
+export const withGmailRead = withGoogleConnection(['openid', 'https://www.googleapis.com/auth/gmail.readonly']);
+
+export const withGmailWrite = withGoogleConnection(['openid', 'https://www.googleapis.com/auth/gmail.compose']);
+
+export const withCalendar = withGoogleConnection(['openid', 'https://www.googleapis.com/auth/calendar.events']);
 
 // Async Authorization flow for user confirmation
 // Note: you must use a client application that has the CIBA grant type enabled
