@@ -67,7 +67,7 @@ Agent configuration lives in `src/lib/agent.ts`. From here, you can change the p
 This package has [@next/bundle-analyzer](https://www.npmjs.com/package/@next/bundle-analyzer) set up by default - you can explore the bundle size interactively by running:
 
 ```bash
-$ ANALYZE=true bun run build
+$ ANALYZE=true npm run build
 ```
 
 ## License
