@@ -4,7 +4,7 @@ import { InMemoryStore, MemorySaver } from '@langchain/langgraph';
 import { Calculator } from '@langchain/community/tools/calculator';
 import { SerpAPI } from '@langchain/community/tools/serpapi';
 import { GmailCreateDraft, GmailSearch } from '@langchain/community/tools/gmail';
-import { GoogleCalendarCreateTool, GoogleCalendarViewTool } from '@langchain/community/tools/google_calendar';
+// import { GoogleCalendarCreateTool, GoogleCalendarViewTool } from '@langchain/community/tools/google_calendar';
 
 import { getAccessToken, withCalendar, withGmailRead, withGmailWrite, withAsyncAuthorization } from './auth0-ai';
 import { getUserInfoTool } from './tools/user-info';
@@ -28,16 +28,16 @@ const gmailParams = {
   },
 };
 
-const googleCalendarParams = {
-  credentials: { accessToken: getAccessToken, calendarId: 'primary' },
-  model: llm,
-};
+// const googleCalendarParams = {
+//   credentials: { accessToken: getAccessToken, calendarId: 'primary' },
+//   model: llm,
+// };
 const tools = [
   new Calculator(),
   withGmailRead(new GmailSearch(gmailParams)),
   withGmailWrite(new GmailCreateDraft(gmailParams)),
-  withCalendar(new GoogleCalendarCreateTool(googleCalendarParams)),
-  withCalendar(new GoogleCalendarViewTool(googleCalendarParams)),
+  // withCalendar(new GoogleCalendarCreateTool(googleCalendarParams)),
+  // withCalendar(new GoogleCalendarViewTool(googleCalendarParams)),
   withCalendar(getCalendarEventsTool),
   getUserInfoTool,
   withAsyncAuthorization(shopOnlineTool),
